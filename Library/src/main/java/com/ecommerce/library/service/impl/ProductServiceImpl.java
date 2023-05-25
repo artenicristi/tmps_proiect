@@ -1,7 +1,9 @@
 package com.ecommerce.library.service.impl;
 
 import com.ecommerce.library.dto.ProductDto;
-import com.ecommerce.library.model.Product;
+import com.ecommerce.library.model.*;
+import com.ecommerce.library.repository.ClothingProductRepository;
+import com.ecommerce.library.repository.ElectronicProductRepository;
 import com.ecommerce.library.repository.ProductRepository;
 import com.ecommerce.library.service.ProductService;
 import com.ecommerce.library.utils.ImageUpload;
@@ -21,6 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final ElectronicProductRepository electronicProductRepository;
+    private final ClothingProductRepository clothingProductRepository;
 
 
     private final ImageUpload imageUpload;
@@ -42,28 +46,33 @@ public class ProductServiceImpl implements ProductService {
         return productDtos;
     }
 
+//    @Override
+//    public Product save(MultipartFile imageProduct, ProductDto productDto) {
+//        Product product = new Product();
+//        try {
+//            if (imageProduct == null) {
+//                product.setImage(null);
+//            } else {
+//                imageUpload.uploadFile(imageProduct);
+//                product.setImage(Base64.getEncoder().encodeToString(imageProduct.getBytes()));
+//            }
+//            product.setName(productDto.getName());
+//            product.setDescription(productDto.getDescription());
+//            product.setCurrentQuantity(productDto.getCurrentQuantity());
+//            product.setCostPrice(productDto.getCostPrice());
+//            product.setCategory(productDto.getCategory());
+//            product.set_deleted(false);
+//            product.set_activated(true);
+//            return productRepository.save(product);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
     @Override
-    public Product save(MultipartFile imageProduct, ProductDto productDto) {
-        Product product = new Product();
-        try {
-            if (imageProduct == null) {
-                product.setImage(null);
-            } else {
-                imageUpload.uploadFile(imageProduct);
-                product.setImage(Base64.getEncoder().encodeToString(imageProduct.getBytes()));
-            }
-            product.setName(productDto.getName());
-            product.setDescription(productDto.getDescription());
-            product.setCurrentQuantity(productDto.getCurrentQuantity());
-            product.setCostPrice(productDto.getCostPrice());
-            product.setCategory(productDto.getCategory());
-            product.set_deleted(false);
-            product.set_activated(true);
-            return productRepository.save(product);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public IProduct save(MultipartFile imageProduct, ProductDto productDto) {
+        ProductFactory productFactory = ProductFactory.getInstance(imageUpload, electronicProductRepository, clothingProductRepository);
+        return productFactory.createProduct(imageProduct, productDto);
     }
 
     @Override

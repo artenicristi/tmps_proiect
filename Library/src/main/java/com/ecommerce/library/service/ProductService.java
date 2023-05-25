@@ -1,6 +1,7 @@
 package com.ecommerce.library.service;
 
 import com.ecommerce.library.dto.ProductDto;
+import com.ecommerce.library.model.IProduct;
 import com.ecommerce.library.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,7 @@ public interface ProductService {
 
     List<ProductDto> allProduct();
 
-    Product save(MultipartFile imageProduct, ProductDto product);
+    IProduct save(MultipartFile imageProduct, ProductDto product);
 
     Product update(MultipartFile imageProduct, ProductDto productDto);
 

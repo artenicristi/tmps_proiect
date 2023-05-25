@@ -2,6 +2,11 @@ package com.ecommerce.admin.controller;
 
 import com.ecommerce.library.dto.ProductDto;
 import com.ecommerce.library.model.Category;
+import com.ecommerce.library.model.ClothingProduct;
+import com.ecommerce.library.model.ElectronicProduct;
+import com.ecommerce.library.model.IProduct;
+import com.ecommerce.library.repository.ClothingProductRepository;
+import com.ecommerce.library.repository.ElectronicProductRepository;
 import com.ecommerce.library.service.CategoryService;
 import com.ecommerce.library.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +21,47 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-
     private final CategoryService categoryService;
+    private final ElectronicProductRepository electronicProductRepository;
+    private final ClothingProductRepository clothingProductRepository;
 
+
+
+//    @GetMapping("/products")
+//    public String products(Model model) {
+//        List<ProductDto> products = productService.allProduct();
+//        model.addAttribute("products", products);
+//        model.addAttribute("size", products.size());
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+//            return "redirect:/login";
+//        }
+//        return "products";
+//    }
 
     @GetMapping("/products")
     public String products(Model model) {
-        List<ProductDto> products = productService.allProduct();
+//        List<ProductDto> products = productService.allProduct();
+
+        List<IProduct> products = new ArrayList<>();
+
+        // Retrieve electronic products
+        List<ElectronicProduct> electronicProducts = electronicProductRepository.findAll();
+        products.addAll(electronicProducts);
+
+        // Retrieve clothing products
+        List<ClothingProduct> clothingProducts = clothingProductRepository.findAll();
+        products.addAll(clothingProducts);
+
+
+
         model.addAttribute("products", products);
         model.addAttribute("size", products.size());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -37,6 +70,8 @@ public class ProductController {
         }
         return "products";
     }
+
+
 
     @GetMapping("/products/{pageNo}")
     public String allProducts(@PathVariable("pageNo") int pageNo, Model model, Principal principal) {
@@ -84,6 +119,7 @@ public class ProductController {
     public String saveProduct(@ModelAttribute("productDto") ProductDto product,
                               @RequestParam("imageProduct") MultipartFile imageProduct,
                               RedirectAttributes redirectAttributes) {
+        product.setSalePrice(product.getCostPrice() * 1.5);
         try {
             productService.save(imageProduct, product);
             redirectAttributes.addFlashAttribute("success", "Add new product successfully!");
