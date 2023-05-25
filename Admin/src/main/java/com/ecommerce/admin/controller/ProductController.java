@@ -1,10 +1,7 @@
 package com.ecommerce.admin.controller;
 
 import com.ecommerce.library.dto.ProductDto;
-import com.ecommerce.library.model.Category;
-import com.ecommerce.library.model.ClothingProduct;
-import com.ecommerce.library.model.ElectronicProduct;
-import com.ecommerce.library.model.IProduct;
+import com.ecommerce.library.model.*;
 import com.ecommerce.library.repository.ClothingProductRepository;
 import com.ecommerce.library.repository.ElectronicProductRepository;
 import com.ecommerce.library.service.CategoryService;
@@ -52,18 +49,23 @@ public class ProductController {
 
         List<IProduct> products = new ArrayList<>();
 
-        // Retrieve electronic products
         List<ElectronicProduct> electronicProducts = electronicProductRepository.findAll();
         products.addAll(electronicProducts);
 
-        // Retrieve clothing products
         List<ClothingProduct> clothingProducts = clothingProductRepository.findAll();
         products.addAll(clothingProducts);
 
+        List<IProduct> discountedProducts = new ArrayList<>();
+
+        for (IProduct product : products) {
+            IProduct discountedProduct = new DiscountProductDecorator(product, 0.5);  // Apply discount decorator
+            discountedProducts.add(discountedProduct);
+        }
 
 
         model.addAttribute("products", products);
         model.addAttribute("size", products.size());
+        model.addAttribute("discountedProducts", discountedProducts);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "redirect:/login";

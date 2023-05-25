@@ -2,7 +2,6 @@ package com.ecommerce.library.model;
 
 public interface IProduct {
     Long getId();
-    void setId(Long id);
 
     String getName();
     void setName(String name);
