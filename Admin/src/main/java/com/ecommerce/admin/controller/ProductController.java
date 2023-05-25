@@ -6,7 +6,9 @@ import com.ecommerce.library.repository.ClothingProductRepository;
 import com.ecommerce.library.repository.ElectronicProductRepository;
 import com.ecommerce.library.service.CategoryService;
 import com.ecommerce.library.service.ProductService;
+import com.ecommerce.library.service.impl.ProductServiceProxy;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,14 +19,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 @Controller
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductService productService;
+//    @Qualifier("productServiceImpl")
+//    private final ProductService productService;
+    private final ProductServiceProxy productServiceProxy;
     private final CategoryService categoryService;
     private final ElectronicProductRepository electronicProductRepository;
     private final ClothingProductRepository clothingProductRepository;
@@ -33,7 +42,7 @@ public class ProductController {
 
 //    @GetMapping("/products")
 //    public String products(Model model) {
-//        List<ProductDto> products = productService.allProduct();
+//        List<ProductDto> products = productServiceProxy.allProduct();
 //        model.addAttribute("products", products);
 //        model.addAttribute("size", products.size());
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -45,7 +54,7 @@ public class ProductController {
 
     @GetMapping("/products")
     public String products(Model model) {
-//        List<ProductDto> products = productService.allProduct();
+//        List<ProductDto> products = productServiceProxy.allProduct();
 
         List<IProduct> products = new ArrayList<>();
 
@@ -62,7 +71,6 @@ public class ProductController {
             discountedProducts.add(discountedProduct);
         }
 
-
         model.addAttribute("products", products);
         model.addAttribute("size", products.size());
         model.addAttribute("discountedProducts", discountedProducts);
@@ -70,7 +78,7 @@ public class ProductController {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return "redirect:/login";
         }
-        return "products";
+        return "products-discount";
     }
 
 
@@ -80,7 +88,7 @@ public class ProductController {
         if (principal == null) {
             return "redirect:/login";
         }
-        Page<ProductDto> products = productService.getAllProducts(pageNo);
+        Page<ProductDto> products = productServiceProxy.getAllProducts(pageNo);
         model.addAttribute("title", "Manage Products");
         model.addAttribute("size", products.getSize());
         model.addAttribute("products", products);
@@ -94,7 +102,7 @@ public class ProductController {
                                 @RequestParam(value = "keyword") String keyword,
                                 Model model
     ) {
-        Page<ProductDto> products = productService.searchProducts(pageNo, keyword);
+        Page<ProductDto> products = productServiceProxy.searchProducts(pageNo, keyword);
         model.addAttribute("title", "Result Search Products");
         model.addAttribute("size", products.getSize());
         model.addAttribute("products", products);
@@ -123,7 +131,7 @@ public class ProductController {
                               RedirectAttributes redirectAttributes) {
         product.setSalePrice(product.getCostPrice() * 1.5);
         try {
-            productService.save(imageProduct, product);
+            productServiceProxy.save(imageProduct, product);
             redirectAttributes.addFlashAttribute("success", "Add new product successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,7 +147,7 @@ public class ProductController {
             return "redirect:/login";
         }
         List<Category> categories = categoryService.findAllByActivatedTrue();
-        ProductDto productDto = productService.getById(id);
+        ProductDto productDto = productServiceProxy.getById(id);
         model.addAttribute("title", "Add Product");
         model.addAttribute("categories", categories);
         model.addAttribute("productDto", productDto);
@@ -152,7 +160,7 @@ public class ProductController {
                                 RedirectAttributes redirectAttributes) {
         try {
 
-            productService.update(imageProduct, productDto);
+            productServiceProxy.update(imageProduct, productDto);
             redirectAttributes.addFlashAttribute("success", "Update successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,7 +172,7 @@ public class ProductController {
     @RequestMapping(value = "/enable-product", method = {RequestMethod.PUT, RequestMethod.GET})
     public String enabledProduct(Long id, RedirectAttributes redirectAttributes) {
         try {
-            productService.enableById(id);
+            productServiceProxy.enableById(id);
             redirectAttributes.addFlashAttribute("success", "Enabled successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -176,7 +184,7 @@ public class ProductController {
     @RequestMapping(value = "/delete-product/{id}", method = {RequestMethod.PUT, RequestMethod.GET})
     public String deletedProduct(RedirectAttributes redirectAttributes, @PathVariable Long id) {
         try {
-            productService.deleteById(id);
+            productServiceProxy.deleteById(id);
             redirectAttributes.addFlashAttribute("success", "Deleted successfully!");
         } catch (Exception e) {
             e.printStackTrace();
