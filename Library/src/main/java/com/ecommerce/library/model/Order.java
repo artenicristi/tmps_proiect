@@ -27,11 +27,26 @@ public class Order {
     private String paymentMethod;
     private boolean isAccept;
 
+    @Transient
+    private OrderState orderState;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id", referencedColumnName = "customer_id")
     private Customer customer;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     private List<OrderDetail> orderDetailList;
+
+    public void setState(OrderState state) {
+        if (state instanceof PendingState) {
+            this.orderStatus = "Pending";
+        } else if (state instanceof ConfirmedState) {
+            this.orderStatus = "Confirmed";
+        } else if (state instanceof ShippedState) {
+            this.orderStatus = "Shipped";
+        } else if (state instanceof CanceledState) {
+            this.orderStatus = "Canceled";
+        }
+    }
 
     @Override
     public String toString() {

@@ -1,8 +1,5 @@
 package com.ecommerce.library.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DiscountProductDecorator extends ProductDecorator{
     private final double discount;
 

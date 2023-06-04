@@ -58,7 +58,7 @@
                         <div class="mb-3">
                             <label for="address">Address *</label>
                             <input type="text" class="form-control"
-                                   th:value="${customer.address + ' ' + customer.city + ' ' + customer.country}"
+                                   value="Default address"
                                    id="address" placeholder="" readonly>
                         </div>
                         <a th:href="@{/profile}" class="btn btn-primary"> Change information</a>
