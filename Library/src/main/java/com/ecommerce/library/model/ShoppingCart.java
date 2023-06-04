@@ -26,6 +26,18 @@ public class ShoppingCart {
 
     private int totalItems;
 
+    @Transient
+    private PaymentStrategy paymentStrategy;
+
+    public void checkout(double amount) {
+        // Perform checkout logic
+
+        // Delegate payment to the current strategy
+        paymentStrategy.processPayment(amount);
+
+        SingletonLogger.getInstance().logWarning("Payment was processed, amount = " + amount);
+    }
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cart")
     private Set<CartItem> cartItems;
 

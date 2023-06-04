@@ -63,15 +63,15 @@
                         </div>
                         <a th:href="@{/profile}" class="btn btn-primary"> Change information</a>
                         <hr class="mb-4">
-                        <div class="title"><span>Payment Methods</span></div>
-                        <div class="d-block my-3">
-                            <div class="custom-control custom-radio">
-                                <input id="debit" name="paymentMethod" type="radio" checked class="custom-control-input"
-                                       required>
-                                <label class="custom-control-label" for="debit">Cash</label>
-                            </div>
-                        </div>
-                        <hr class="mb-1">
+<!--                        <div class="title"><span>Payment Methods</span></div>-->
+<!--                        <div class="d-block my-3">-->
+<!--                            <div class="custom-control custom-radio">-->
+<!--                                <input id="debit" name="paymentMethod" type="radio" checked class="custom-control-input"-->
+<!--                                       required>-->
+<!--                                <label class="custom-control-label" for="debit">Cash</label>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <hr class="mb-1">-->
                     </form>
                 </div>
             </div>
@@ -128,6 +128,18 @@
                             <hr>
                         </div>
                     </div>
+                    <div class="title"><span>Payment Methods</span></div>
+                    <div class="d-block my-3">
+                        <div class="custom-control custom-radio">
+                            <label>
+                                <input type="radio" name="paymentMethod" value="cash" checked> Cash
+                            </label>
+                            <label>
+                                <input type="radio" name="paymentMethod" value="card"> Card
+                            </label>
+                        </div>
+                    </div>
+                    <hr class="mb-1">
                     <div class="col-12 d-flex shopping-box">
                         <button type="submit" class="ml-auto btn hvr-hover">Place Order</button>
                     </div>

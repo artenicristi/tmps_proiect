@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -82,14 +83,27 @@ public class OrderController {
 
 
     @RequestMapping(value = "/add-order", method = {RequestMethod.POST})
-    public String createOrder(Principal principal,
+    public String createOrder(
+            @RequestParam("paymentMethod") String paymentMethod,
+                            Principal principal,
                               Model model,
                               HttpSession session) {
+        SingletonLogger.getInstance().logWarning("In the addOrder method");
         if (principal == null) {
             return "redirect:/login";
         } else {
             Customer customer = customerService.findByUsername(principal.getName());
             ShoppingCart cart = customer.getCart();
+
+            PaymentStrategy strategy = null;
+            if (paymentMethod.equals("card")) {
+                strategy = new CardPaymentStrategy();
+            } else if (paymentMethod.equals("cash")) {
+                strategy = new CashPaymentStrategy();
+            }
+            cart.setPaymentStrategy(strategy);
+            cart.checkout(cart.getTotalPrice());
+
             Order order = orderService.save(cart);
             session.removeAttribute("totalItems");
             model.addAttribute("order", order);
